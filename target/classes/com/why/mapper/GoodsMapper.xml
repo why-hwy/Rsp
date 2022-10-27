@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.why.mapper.GoodsMapper">
+    <!--    <sql id="goods_column">-->
+    <!--        id, goods_name as goodsName, company_name as companyName, ordered, description, status-->
+    <!--    </sql>-->
+    <!--    <select id="selectAll" resultType="com.why.pojo.Goods">-->
+    <!--        select-->
+    <!--        <include refid="goods_column"></include>-->
+    <!--        from goods;-->
+    <!--    </select>-->
+    <resultMap id="goodsResultMap" type="com.why.pojo.Goods">
+        <result column="goods_name" property="goodsName"></result>
+        <result column="company_name" property="companyName"></result>
+    </resultMap>
+
+    <select id="selectAll" resultMap="goodsResultMap">
+        select *
+        from goods;
+    </select>
+
+    <select id="selectById" resultMap="goodsResultMap">
+        select *
+        from goods
+        where id > #{id};
+    </select>
+
+    <select id="selectByConition" resultMap="goodsResultMap">
+        select *
+        from goods
+        <where>
+            <if test="status != null">
+                status=#{status}
+            </if>
+            <if test="companyName != null and companyName !='' ">
+                and
+                company_name like #{companyName}
+            </if>
+            <if test="goodsName != null and goodsName !='' ">
+                and
+                goods_name like #{goodsName};
+            </if>
+        </where>
+    </select>
+
+    <select id="selectByConitionSingle" resultMap="goodsResultMap">
+        select *
+        from goods
+        where
+        <choose>
+            <when test="status!=null">
+                status=#{status}
+            </when>
+            <when test="companyName != null and companyName !='' ">
+                company_name like #{companyName}
+            </when>
+            <when test="goodsName != null and goodsName !='' ">
+                goods_name like #{goodsName};
+            </when>
+            <otherwise>
+                1=1
+            </otherwise>
+        </choose>
+    </select>
+
+    <insert id="addGoods" useGeneratedKeys="true" keyProperty="id">
+        insert into goods(goods_name, company_name, ordered, description, status)
+        values (#{goodsName}, #{companyName}, #{ordered}, #{description}, #{status})
+    </insert>
+
+    <update id="upData">
+        update goods
+        <set>
+            <if test="goodsName != null and goodsName !='' ">goods_name=#{goodsName},</if>
+            <if test="companyName != null and companyName !='' ">company_name=#{companyName},</if>
+            <if test="ordered!=null">ordered=#{ordered},</if>
+            <if test="description != null and description !='' ">description=#{description},</if>
+            <if test="status!=null ">status=#{status}</if>
+        </set>
+        where id = #{id}
+    </update>
+
+    <delete id="deletById">
+        delete
+        from goods
+        where id = #{id}
+    </delete>
+
+    <delete id="deletByIds">
+        delete
+        from goods
+        where id in
+        <foreach collection="ids" item="id" separator="," open="(" close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+
+</mapper>
